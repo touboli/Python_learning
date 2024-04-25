@@ -4,7 +4,6 @@
 
 '''
 Created on 2024年04月24日
-
 @author: libo
 '''
 #http://quote.eastmoney.com/center/gridlist.html
@@ -12,7 +11,6 @@ Created on 2024年04月24日
 
 import requests
 from fake_useragent import UserAgent
-from bs4 import BeautifulSoup 
 import json
 import csv
  
@@ -37,7 +35,7 @@ if __name__ == '__main__':
 		# if (str().startswith('6') or str(data["f12"]).startswith('3') or str(data["f12"]).startswith('0')):
 		row = [data["f12"],data["f14"]]
 		datalist.append(row)
-	print(datalist)		
+	print(datalist)
 			
 	f =open('stock.csv','w+',encoding='utf-8',newline="")
 	writer = csv.writer(f)
@@ -51,18 +49,11 @@ if __name__ == '__main__':
 
 
 import csv
-import urllib.request as r
-import os
 import json
 
 def getStockData(url):
      headers = {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0",
-          "Accept": "*/*",
-          "Host": "push2his.eastmoney.com",
-          "Connection": "keep-alive",
-          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
-          "Accept-Encoding": "gzip, deflate, br, zstd",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0"
      }
      response = requests.get(url,headers)    
      if response.status_code == 200:
@@ -89,26 +80,21 @@ urlEnd = '&ut=fa5fd1943c7b386f172d6893dbfba10b&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2C
 if __name__ == '__main__':
 	stockList = getStockList()
 	stockList.pop(0)
-	print(stockList)
 	for s in stockList:
           scode = str(s[0].split("\t")[0])   
 		#0：沪市；1：深市
           url = urlStart + scode + urlEnd
-          print(url)
           filepath = (str(s[1].split("\t")[0])+"_"+scode) + ".text" 
           i=getStockData(url)
-          print(type(i))
           start1 = i.index('(')
           end1 = i.rindex(')')
           midvalue = i[start1:end1]
           start2 = midvalue.index('[')
           end2 = midvalue.rindex(']')
           json_str = midvalue[start2+1:end2]
-          print(type(json_str))
           json_str = json_str.split('","')
           last_element = json_str[-1]
           last_element = last_element[:-1]
-          print(type(last_element))
           filepath = filepath.replace('*','')
 
           with open(filepath, 'w') as f:
@@ -123,8 +109,6 @@ if __name__ == '__main__':
 
 # In[16]:
 
-
-import pandas as pd
 import matplotlib.pyplot as plt
 import csv
 # 设置显示中文
@@ -147,8 +131,7 @@ def get_files_path():
     paths = []
     for stock in stock_list[1:]:
         p = stock[1].strip()+"_"+stock[0].strip()+".text"
-        b = stock[1].strip()+"_"+stock[0].strip() 
-        print(p) 
+        b = stock[1].strip()+"_"+stock[0].strip()  
         data = read_file(p)
         file = data
         print(type(data))
@@ -171,8 +154,6 @@ def get_image(data_dict):
      plt.tight_layout()
      plt.show()
      
-
-
 
 print(len(files))
 open_dict,end_dict,high_dict,low_dict = {},{},{},{}
