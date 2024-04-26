@@ -3,7 +3,7 @@
 # ## 股票信息爬取
 
 '''
-Created on 2024年04月24日
+Created on 2024年04月26日
 @author: libo
 '''
 #http://quote.eastmoney.com/center/gridlist.html
@@ -32,7 +32,6 @@ if __name__ == '__main__':
 	datas = resJson["data"]["diff"]
 	datalist = []
 	for data in datas:
-		# if (str().startswith('6') or str(data["f12"]).startswith('3') or str(data["f12"]).startswith('0')):
 		row = [data["f12"],data["f14"]]
 		datalist.append(row)
 	print(datalist)
@@ -55,7 +54,7 @@ def getStockData(url):
      headers = {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0"
      }
-     response = requests.get(url,headers)    
+     response = requests.get(url,headers)
      if response.status_code == 200:
         return response.text
      return None
@@ -79,7 +78,7 @@ urlEnd = '&ut=fa5fd1943c7b386f172d6893dbfba10b&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2C
 
 if __name__ == '__main__':
 	stockList = getStockList()
-	stockList.pop(0)
+	stockList.pop(0)       # 删除第一行的标题，这是不要的数据
 	for s in stockList:
           scode = str(s[0].split("\t")[0])   
 		#0：沪市；1：深市
@@ -89,24 +88,16 @@ if __name__ == '__main__':
           start1 = i.index('(')
           end1 = i.rindex(')')
           midvalue = i[start1:end1]
-          start2 = midvalue.index('[')
-          end2 = midvalue.rindex(']')
-          json_str = midvalue[start2+1:end2]
-          json_str = json_str.split('","')
-          last_element = json_str[-1]
-          last_element = last_element[:-1]
+          i = i.split('[')[1].split(']')[0]
+          json_str = i.split('",')[-1]
+          json_str = json_str.strip('""')
           filepath = filepath.replace('*','')
 
           with open(filepath, 'w') as f:
-              f.write(last_element)
+              f.write(json_str)
           print('股票数据已保存到文件：', filepath)
-		
-		
-
 
 # ## 股票信息分析
-# 
-
 # In[16]:
 
 import matplotlib.pyplot as plt
@@ -128,7 +119,6 @@ def read_file(file_name):
 
 def get_files_path():
     stock_list=getStockList()
-    paths = []
     for stock in stock_list[1:]:
         p = stock[1].strip()+"_"+stock[0].strip()+".text"
         b = stock[1].strip()+"_"+stock[0].strip()  
@@ -154,16 +144,11 @@ def get_image(data_dict):
      plt.tight_layout()
      plt.show()
      
-
-print(len(files))
 open_dict,end_dict,high_dict,low_dict = {},{},{},{}
 
 for file in files:
     if len(file)== 12:
-         open_dict[file[-1]] = file[1]        # 这里可以换成for循环的形式，但是为了方便理解，就这样写了
-         end_dict[file[-1]] = file[2]
-         high_dict[file[-1]] = file[3]
-         low_dict[file[-1]] = file[4]
+         open_dict[file[-1]] = file[1]
 date = files[0][0]
 data = str(date)
 get_image(open_dict)
